@@ -154,7 +154,7 @@ def iterativeDeepeningSearch(problem):
     while (DepthLimitingSearch(stack, depthLimit, problem) == []):
         depthLimit = depthLimit + 1
 
-    return DepthLimitingSearch(stack, depthLimit, problem)(stack, depthLimit, problem)
+    return DepthLimitingSearch(stack, depthLimit, problem)
 
 
 def breadthFirstSearch(problem):
