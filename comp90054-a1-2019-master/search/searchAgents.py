@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -368,6 +368,9 @@ class AStarCornersAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, cornersHeuristic)
         self.searchType = CornersProblem
 
+
+
+
 class FoodSearchProblem:
     """
     A search problem associated with finding the a path that collects all of the
@@ -424,6 +427,19 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+class CapsuleSearchProblem:
+    "Hello"
+
+class CapsuleSearchAgent:
+    "Hello"
+
+def manhattan_distance(a,b):
+
+    xy1 = a
+    xy2 = b
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -453,8 +469,23 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+
+    "Useses the largest Manhtannan distance of the distances between Pacman's position"
+    "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
+
+    foodList = foodGrid.asList()
+
+    maxDistance = 0
+
+    for food in foodList:
+
+        distance = manhattan_distance(position, food)
+
+        if (distance > maxDistance):
+            maxDistance = distance
+
+    return maxDistance
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

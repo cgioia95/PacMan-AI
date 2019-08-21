@@ -91,63 +91,76 @@ def depthFirstSearch(problem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
-    stack=util.Stack()
-    visited=[]
-    startNode=(problem.getStartState(),[])        #Here we are pushing the start state
-    stack.push(startNode)
-    while not stack.isEmpty():
-        popped=stack.pop()
-        location=popped[0]
-        path=popped[1]
-        if location not in visited:               #In each node we see if it is visited,if it's not then we are getting the successors and push
-            visited.append(location)              #its elements to the stack and we are building the path in depth-first logic and way
-            if problem.isGoalState(location):
-                return path
-            successors=problem.getSuccessors(location)
-            for suc in list(successors):
-                if suc[0] not in visited:
-                    stack.push((suc[0],path+[suc[1]]))
-    return []
-    util.raiseNotDefined()
+
+
+
 
 def iterativeDeepeningSearch(problem):
     """Search the deepest node in an iterative manner."""
     "*** YOUR CODE HERE FOR TASK 1 ***"
-    "ALERT: Code below was ripped, make sure to alter a shitload prior to uploading"
 
-    from game import Directions
+    "Intiialize the stack and set the initial Depth Limit to 1"
+    depthLimit = 1;
+    stack = util.Stack();
 
-    #initialization
-    fringe = util.Stack()
-    limit = 1;
+    while True:
 
-    while True: # repeat search with the depth increases until we find the goal
-        visitedList = []
-        #push the starting point into stack
-        fringe.push((problem.getStartState(),[],0))
-        #pop out the point
-        (state,toDirection,toCost) = fringe.pop()
-        #add the point to visited list
-        visitedList.append(state)
-        while not problem.isGoalState(state): #while we do not find the goal point
-            successors = problem.getSuccessors(state) #get the point's succesors
-            for son in successors:
-                # add the points when it meets 1. not been visited 2. within the depth
-                if (not son[0] in visitedList) and (toCost + son[2] <= limit):
-                    fringe.push((son[0],toDirection + [son[1]],toCost + son[2]))
-                    visitedList.append(son[0]) # add this point to visited list
+        "Run this section every time we increment our depth to set up the Depth Limiting Search"
+        "Initializes visited states to null, pushes the starting node to stack"
+        "and adds the starting state to the visited states list "
+        "also accesses the key data from the node"
 
-            if fringe.isEmpty(): # if the no goal is found within the current depth, jump out and increase the depth
-                break
+        visitedStates = []
+        stack.push((problem.getStartState(), [], 0))
 
-            (state,toDirection,toCost) = fringe.pop()
+        node = stack.pop()
+        state = node[0]
+        directionsToThisNode = node[1]
+        costToThisNode = node[2]
 
-        if problem.isGoalState(state):
-            return toDirection
+        visitedStates.append((state))
 
-        limit += 1 # increase the depth
+        "This while loop runs the Depth Limiting Search by implementing the stack to search for the deepest node"
+        "Every time it runs, it checks if currently inspected state is the goal state"
+        "If the goal state, while loop breaks and skips to final check that returns the directions"
+        "Otherwise, it adds all the successors to the stack and inspects them too"
+        while (problem.isGoalState(state) != True):
 
+            succesorNodes = problem.getSuccessors(state)
 
+            "Inspecting a successor node"
+            for successorNode in succesorNodes:
+
+                "Parse key data from succesorNodes"
+                succesorState = successorNode[0]
+                succesorDirection = successorNode[1]
+                succesorCost = successorNode[2]
+                totalDepth = costToThisNode + succesorCost
+
+                previouslyVisited = succesorState in visitedStates
+                inDepth = totalDepth <= depthLimit
+
+                "Check if the successor state has been previously visited and within this iterations depthLimit"
+                "If both checks are true, the state is a valid candidate for Goal State and added to the stack/visited list"
+                if ((previouslyVisited!= True) and inDepth):
+                    stack.push( (succesorState, directionsToThisNode + [succesorDirection], totalDepth))
+                    visitedStates.append(succesorState)
+
+            "The loop generating the successors and adding to the stack is finished"
+            "If the stack isnt empty, pop it to inspect if has a goal state when the while performs its isGoalState check"
+            "Otherwise break the goal state test as there are no more nodes to inspect at this depthLimit, so increment depthLimit"
+            if (stack.isEmpty()):
+                break;
+            else:
+                node = stack.pop()
+                state = node[0]
+                directionsToThisNode = node[1]
+                costToThisNode = node[2]
+        "final check to see if state is goal state, if so, returns its associated set of directions for Pacman"
+        if (problem.isGoalState(state)):
+            return directionsToThisNode
+
+        depthLimit += 1
 
 
 def breadthFirstSearch(problem):
@@ -170,14 +183,119 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE IF YOU WANT TO PRACTICE ***"
-    util.raiseNotDefined()
+    p_inf = float("inf")
+
+    pQueue = util.PriorityQueue();
+    closed = set()
+
+    bestG = {}
+
+    initState = problem.getStartState();
+    initDirections = []
+    initCost = 0
+
+    initNode = (initState, initDirections, initCost)
+
+    pQueue.push(initNode, heuristic(initState, problem))
+
+    while (pQueue.isEmpty() != True ):
+
+        minNodePopped = pQueue.pop()
+        state = minNodePopped[0]
+        directions = minNodePopped[1]
+        cost = minNodePopped[2]
+
+
+        if (state not in closed or cost < bestG[state]):
+
+            closed.add(state)
+            bestG[state] = cost
+
+            if (problem.isGoalState(state)):
+                return directions
+
+
+            succesorNodes = problem.getSuccessors(state)
+
+            for successorNode in succesorNodes:
+
+                "Parse key data from succesorNodes"
+                succesorState = successorNode[0]
+                succesorDirection = successorNode[1]
+                succesorCost = successorNode[2]
+
+                cost = cost + succesorCost
+                totalCost = cost + heuristic(succesorState, problem)
+
+                totalDirection = directions + [succesorDirection]
+
+                if (heuristic(succesorState, problem) < p_inf):
+
+                    pQueue.push((succesorState, totalDirection, totalCost), totalCost)
+
+    return []
+
 
 
 
 def waStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has has the weighted (x 2) lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE FOR TASK 2 ***"
-    util.raiseNotDefined()
+
+    p_inf = float("inf")
+
+    pQueue = util.PriorityQueue();
+    closed = set()
+
+    bestG = {}
+
+    initState = problem.getStartState();
+    initDirections = []
+    initCost = 0
+
+    initNode = (initState, initDirections, initCost)
+
+    pQueue.push(initNode, 2*heuristic(initState, problem))
+
+    while (pQueue.isEmpty() != True ):
+
+        minNodePopped = pQueue.pop()
+        state = minNodePopped[0]
+        directions = minNodePopped[1]
+        cost = minNodePopped[2]
+
+
+        if (state not in closed or cost < bestG[state]):
+
+            closed.add(state)
+            bestG[state] = cost
+
+            if (problem.isGoalState(state)):
+                return directions
+
+
+            succesorNodes = problem.getSuccessors(state)
+
+            for successorNode in succesorNodes:
+
+                "Parse key data from succesorNodes"
+                succesorState = successorNode[0]
+                succesorDirection = successorNode[1]
+                succesorCost = successorNode[2]
+
+                cost = cost + succesorCost
+                totalCost = cost + 2*heuristic(succesorState, problem)
+
+                totalDirection = directions + [succesorDirection]
+
+                if (2*heuristic(succesorState, problem) < p_inf):
+
+                    pQueue.push((succesorState, totalDirection, totalCost), totalCost)
+
+    return []
+
+
+
 
 
 # Abbreviations
