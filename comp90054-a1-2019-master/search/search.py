@@ -174,6 +174,55 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+def foodHeuristic(state, problem):
+    """
+    Your heuristic for the FoodSearchProblem goes here.
+
+    This heuristic must be consistent to ensure correctness.  First, try to come
+    up with an admissible heuristic; almost all admissible heuristics will be
+    consistent as well.
+
+    If using A* ever finds a solution that is worse uniform cost search finds,
+    your heuristic is *not* consistent, and probably not admissible!  On the
+    other hand, inadmissible or inconsistent heuristics may find optimal
+    solutions, so be careful.
+
+    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
+    (see game.py) of either True or False. You can call foodGrid.asList() to get
+    a list of food coordinates instead.
+
+    If you want access to info like walls, capsules, etc., you can query the
+    problem.  For example, problem.walls gives you a Grid of where the walls
+    are.
+
+    If you want to *store* information to be reused in other calls to the
+    heuristic, there is a dictionary called problem.heuristicInfo that you can
+    use. For example, if you only want to count the walls once and store that
+    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
+    Subsequent calls to this heuristic can access
+    problem.heuristicInfo['wallCount']
+    """
+    position, foodGrid = state
+
+    print(position)
+    print(foodGrid)
+    "Useses the largest Manhtannan distance of the distances between Pacman's position"
+    "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
+
+    foodList = foodGrid.asList()
+
+    maxDistance = 0
+
+    for food in foodList:
+
+        distance = manhattan_distance(position, food)
+
+        if (distance > maxDistance):
+            maxDistance = distance
+
+    return maxDistance
+
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE IF YOU WANT TO PRACTICE ***"
@@ -289,8 +338,58 @@ def waStarSearch(problem, heuristic=nullHeuristic):
     return []
 
 
+def foodHeuristic(state, problem):
+    """
+    Your heuristic for the FoodSearchProblem goes here.
+
+    This heuristic must be consistent to ensure correctness.  First, try to come
+    up with an admissible heuristic; almost all admissible heuristics will be
+    consistent as well.
+
+    If using A* ever finds a solution that is worse uniform cost search finds,
+    your heuristic is *not* consistent, and probably not admissible!  On the
+    other hand, inadmissible or inconsistent heuristics may find optimal
+    solutions, so be careful.
+
+    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
+    (see game.py) of either True or False. You can call foodGrid.asList() to get
+    a list of food coordinates instead.
+
+    If you want access to info like walls, capsules, etc., you can query the
+    problem.  For example, problem.walls gives you a Grid of where the walls
+    are.
+
+    If you want to *store* information to be reused in other calls to the
+    heuristic, there is a dictionary called problem.heuristicInfo that you can
+    use. For example, if you only want to count the walls once and store that
+    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
+    Subsequent calls to this heuristic can access
+    problem.heuristicInfo['wallCount']
+    """
+    position, foodGrid = state
 
 
+    "Useses the largest Manhtannan distance of the distances between Pacman's position"
+    "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
+
+    foodList = foodGrid.asList()
+
+    maxDistance = 0
+
+    for food in foodList:
+
+        distance = manhattan_distance(position, food)
+
+        if (distance > maxDistance):
+            maxDistance = distance
+
+    return maxDistance
+
+def manhattan_distance(a,b):
+
+    xy1 = a
+    xy2 = b
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
 # Abbreviations
 bfs = breadthFirstSearch

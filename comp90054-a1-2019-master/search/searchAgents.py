@@ -37,6 +37,7 @@ Good luck and happy searching!
 from game import Directions
 from game import Agent
 from game import Actions
+from game import GameStateData
 import util
 import time
 import search
@@ -247,6 +248,7 @@ class CapsuleSearchProblem:
         costFn: A function from a search state (tuple) to a non-negative number
         goal: A position in the gameState
         """
+        self.gameState = gameState
         self.walls = gameState.getWalls()
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
@@ -254,7 +256,7 @@ class CapsuleSearchProblem:
         self.food = gameState.getFood()
         self.costFn = costFn
         self.visualize = visualize
-        if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
+        if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(self.goal)):
             print('Warning: this does not look like a regular search maze')
 
         # For display purposes
@@ -266,7 +268,11 @@ class CapsuleSearchProblem:
     def isGoalState(self, state):
         isGoal = state == self.goal
 
+        "TRANSITION SECTION"
+        self.gameState._win = True
+        if (isGoal):
 
+            print("GOAL")
 
         "HERE IS WE'RE WE SHOULD PROBABLY LET the food search agent to takeover the show"
         # For display purposes only
@@ -369,6 +375,8 @@ class CapsuleSearchAgent:
     """
 
     def __init__(self, fn='waStarSearch', prob='CapsuleSearchProblem', heuristic='nullHeuristic'):
+
+        heuristic='nullHeuristic'
         # Warning: some advanced Python magic is employed below to find the right functions and problems
 
         # Get the search function from the name and heuristic
@@ -381,18 +389,28 @@ class CapsuleSearchAgent:
         else:
             if heuristic in globals().keys():
                 heur = globals()[heuristic]
+
+
             elif heuristic in dir(search):
                 heur = getattr(search, heuristic)
+                heur2 = getattr(search, "foodHeuristic")
+
             else:
                 raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
             print('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic))
             # Note: this bit of Python trickery combines the search algorithm and the heuristic
             self.searchFunction = lambda x: func(x, heuristic=heur)
+            self.searchFunction2 = lambda x: func(x, heuristic=heur2)
+
 
         # Get the search problem type from the name
         if prob not in globals().keys() or not prob.endswith('Problem'):
             raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
         self.searchType = globals()[prob]
+        self.searchType2 = globals()['FoodSearchProblem']
+
+
+
         print('[SearchAgent] using problem type ' + prob)
 
     def registerInitialState(self, state):
@@ -406,8 +424,46 @@ class CapsuleSearchAgent:
         """
         if self.searchFunction == None: raise Exception("No search function provided for SearchAgent")
         starttime = time.time()
+
+
+
         problem = self.searchType(state) # Makes a new search problem
         self.actions  = self.searchFunction(problem) # Find a path
+
+
+        state2 = state
+        for action in self.actions:
+            state2= state2.generatePacmanSuccessor(action)
+
+
+        problem2 = self.searchType2(state2)
+
+        self.actions2  = self.searchFunction2(problem2)
+
+        self.actions3= self.actions + self.actions2
+
+        state3 =state2
+        for action in self.actions2:
+            state3= state3.generatePacmanSuccessor(action)
+
+        print(state3)
+
+
+        self.actions = self.actions3
+
+        "We now possess a copy of a state in the capsule acquired position"
+        "Using this we need to generate the actions from here to all the food using wastar foodheuristic"
+        "then we simply add these actions to the previous capsule set and we're done"
+
+
+
+
+
+
+        "Over here we want to trick the agent into performing a foodsearch wastar with a foodheuristic"
+        "Generate "
+
+
         totalCost = problem.getCostOfActions(self.actions)
         print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
         if '_expanded' in dir(problem): print('Search nodes expanded: %d' % problem._expanded)
@@ -669,6 +725,7 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+
 
     "Useses the largest Manhtannan distance of the distances between Pacman's position"
     "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
