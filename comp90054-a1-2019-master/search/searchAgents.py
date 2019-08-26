@@ -268,11 +268,7 @@ class CapsuleSearchProblem:
     def isGoalState(self, state):
         isGoal = state == self.goal
 
-        "TRANSITION SECTION"
-        self.gameState._win = True
-        if (isGoal):
 
-            print("GOAL")
 
         "HERE IS WE'RE WE SHOULD PROBABLY LET the food search agent to takeover the show"
         # For display purposes only
@@ -397,7 +393,7 @@ class CapsuleSearchAgent:
 
             else:
                 raise AttributeError(heuristic + ' is not a function in searchAgents.py or search.py.')
-            print('[SearchAgent] using function %s and heuristic %s' % (fn, heuristic))
+            print('[SearchAgent] using function %s and foodHeuristic for FoodSearchProblem section and nullHeuristic for finding Capsules' % (fn))
             # Note: this bit of Python trickery combines the search algorithm and the heuristic
             self.searchFunction = lambda x: func(x, heuristic=heur)
             self.searchFunction2 = lambda x: func(x, heuristic=heur2)
@@ -408,8 +404,6 @@ class CapsuleSearchAgent:
             raise AttributeError(prob + ' is not a search problem type in SearchAgents.py.')
         self.searchType = globals()[prob]
         self.searchType2 = globals()['FoodSearchProblem']
-
-
 
         print('[SearchAgent] using problem type ' + prob)
 
@@ -430,16 +424,21 @@ class CapsuleSearchAgent:
         problem = self.searchType(state) # Makes a new search problem
         self.actions  = self.searchFunction(problem) # Find a path
 
+        expanded1 = problem._expanded
 
         state2 = state
         for action in self.actions:
-            print(state2)
             state2= state2.generatePacmanSuccessor(action)
 
 
         problem2 = self.searchType2(state2)
 
+
+
         self.actions2  = self.searchFunction2(problem2)
+
+        expanded2 = problem2._expanded
+
 
         self.actions3= self.actions + self.actions2
 
@@ -447,8 +446,8 @@ class CapsuleSearchAgent:
         for action in self.actions2:
             state3= state3.generatePacmanSuccessor(action)
 
-        print(state3)
 
+        totalExpanded = expanded1 + expanded2
 
         self.actions = self.actions3
 
@@ -456,18 +455,13 @@ class CapsuleSearchAgent:
         "Using this we need to generate the actions from here to all the food using wastar foodheuristic"
         "then we simply add these actions to the previous capsule set and we're done"
 
-
-
-
-
-
         "Over here we want to trick the agent into performing a foodsearch wastar with a foodheuristic"
         "Generate "
 
 
         totalCost = problem.getCostOfActions(self.actions)
         print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
-        if '_expanded' in dir(problem): print('Search nodes expanded: %d' % problem._expanded)
+        if '_expanded' in dir(problem): print('Search nodes expanded: %d' % totalExpanded)
 
     def getAction(self, state):
         """
