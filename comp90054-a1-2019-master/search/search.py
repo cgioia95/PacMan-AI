@@ -180,57 +180,6 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has has the weighted (x 2) lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE FOR TASK 2 ***"
 
-    p_inf = float("inf")
-
-    pQueue = util.PriorityQueue();
-    closed = set()
-
-    bestG = {}
-
-    initState = problem.getStartState();
-    initDirections = []
-    initCost = 0
-
-    initNode = (initState, initDirections, initCost)
-
-    pQueue.push(initNode, 2*heuristic(initState, problem))
-
-    while (pQueue.isEmpty() != True ):
-
-        minNodePopped = pQueue.pop()
-        state = minNodePopped[0]
-        directions = minNodePopped[1]
-        cost = minNodePopped[2]
-
-
-        if (state not in closed or cost < bestG[state]):
-
-            closed.add(state)
-            bestG[state] = cost
-
-            if (problem.isGoalState(state)):
-                return directions
-
-
-            succesorNodes = problem.getSuccessors(state)
-
-            for successorNode in succesorNodes:
-
-                "Parse key data from succesorNodes"
-                succesorState = successorNode[0]
-                succesorDirection = successorNode[1]
-                succesorCost = successorNode[2]
-
-                cost = cost + succesorCost
-                totalCost = cost + 2*heuristic(succesorState, problem)
-
-                totalDirection = directions + [succesorDirection]
-
-                if (2*heuristic(succesorState, problem) < p_inf):
-
-                    pQueue.push((succesorState, totalDirection, totalCost), totalCost)
-
-    return []
 
     util.raiseNotDefined()
 
@@ -343,7 +292,7 @@ def waStarSearch(problem, heuristic=nullHeuristic):
 
                 totalDirection = directions + [succesorDirection]
 
-                if (2*heuristic(succesorState, problem) < p_inf):
+                if (2*heuristic(succesorState, problem) < 999999):
 
                     pQueue.push((succesorState, totalDirection, totalCost), totalCost)
 
