@@ -433,6 +433,7 @@ class CapsuleSearchAgent:
 
         state2 = state
         for action in self.actions:
+            print(state2)
             state2= state2.generatePacmanSuccessor(action)
 
 

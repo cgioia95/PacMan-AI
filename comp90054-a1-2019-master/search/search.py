@@ -93,7 +93,22 @@ def depthFirstSearch(problem):
 
 
 
-def DepthLimitingSearch(stack, depthLimit, problem):
+
+
+def iterativeDeepeningSearch(problem):
+    """Search the deepest node in an iterative manner."""
+    "*** YOUR CODE HERE FOR TASK 1 ***"
+
+    "Intiialize the stack and set the initial Depth Limit to 1"
+    depthLimit = 1;
+    stack = util.Stack();
+
+    while True:
+
+        "Run this section every time we increment our depth to set up the Depth Limiting Search"
+        "Initializes visited states to null, pushes the starting node to stack"
+        "and adds the starting state to the visited states list "
+        "also accesses the key data from the node"
 
         visitedStates = []
         stack.push((problem.getStartState(), [], 0))
@@ -105,6 +120,10 @@ def DepthLimitingSearch(stack, depthLimit, problem):
 
         visitedStates.append((state))
 
+        "This while loop runs the Depth Limiting Search by implementing the stack to search for the deepest node"
+        "Every time it runs, it checks if currently inspected state is the goal state"
+        "If the goal state, while loop breaks and skips to final check that returns the directions"
+        "Otherwise, it adds all the successors to the stack and inspects them too"
         while (problem.isGoalState(state) != True):
 
             succesorNodes = problem.getSuccessors(state)
@@ -131,30 +150,17 @@ def DepthLimitingSearch(stack, depthLimit, problem):
             "If the stack isnt empty, pop it to inspect if has a goal state when the while performs its isGoalState check"
             "Otherwise break the goal state test as there are no more nodes to inspect at this depthLimit, so increment depthLimit"
             if (stack.isEmpty()):
-                break
+                break;
             else:
                 node = stack.pop()
                 state = node[0]
                 directionsToThisNode = node[1]
                 costToThisNode = node[2]
-
+        "final check to see if state is goal state, if so, returns its associated set of directions for Pacman"
         if (problem.isGoalState(state)):
             return directionsToThisNode
-        else:
-            return []
 
-
-
-def iterativeDeepeningSearch(problem):
-    """Search the deepest node in an iterative manner."""
-
-    depthLimit = 1;
-    stack = util.Stack();
-
-    while (DepthLimitingSearch(stack, depthLimit, problem) == []):
-        depthLimit = depthLimit + 1
-
-    return DepthLimitingSearch(stack, depthLimit, problem)
+        depthLimit += 1
 
 
 def breadthFirstSearch(problem):
@@ -174,110 +180,10 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def foodHeuristic(state, problem):
-    """
-    Your heuristic for the FoodSearchProblem goes here.
-
-    This heuristic must be consistent to ensure correctness.  First, try to come
-    up with an admissible heuristic; almost all admissible heuristics will be
-    consistent as well.
-
-    If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
-    other hand, inadmissible or inconsistent heuristics may find optimal
-    solutions, so be careful.
-
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
-    (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
-
-    If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
-
-    If you want to *store* information to be reused in other calls to the
-    heuristic, there is a dictionary called problem.heuristicInfo that you can
-    use. For example, if you only want to count the walls once and store that
-    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
-    Subsequent calls to this heuristic can access
-    problem.heuristicInfo['wallCount']
-    """
-    position, foodGrid = state
-
-    print(position)
-    print(foodGrid)
-    "Useses the largest Manhtannan distance of the distances between Pacman's position"
-    "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
-
-    foodList = foodGrid.asList()
-
-    maxDistance = 0
-
-    for food in foodList:
-
-        distance = manhattan_distance(position, food)
-
-        if (distance > maxDistance):
-            maxDistance = distance
-
-    return maxDistance
-
-
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE IF YOU WANT TO PRACTICE ***"
-    p_inf = float("inf")
-
-    pQueue = util.PriorityQueue();
-    closed = set()
-
-    bestG = {}
-
-    initState = problem.getStartState();
-    initDirections = []
-    initCost = 0
-
-    initNode = (initState, initDirections, initCost)
-
-    pQueue.push(initNode, heuristic(initState, problem))
-
-    while (pQueue.isEmpty() != True ):
-
-        minNodePopped = pQueue.pop()
-        state = minNodePopped[0]
-        directions = minNodePopped[1]
-        cost = minNodePopped[2]
-
-
-        if (state not in closed or cost < bestG[state]):
-
-            closed.add(state)
-            bestG[state] = cost
-
-            if (problem.isGoalState(state)):
-                return directions
-
-
-            succesorNodes = problem.getSuccessors(state)
-
-            for successorNode in succesorNodes:
-
-                "Parse key data from succesorNodes"
-                succesorState = successorNode[0]
-                succesorDirection = successorNode[1]
-                succesorCost = successorNode[2]
-
-                cost = cost + succesorCost
-                totalCost = cost + heuristic(succesorState, problem)
-
-                totalDirection = directions + [succesorDirection]
-
-                if (heuristic(succesorState, problem) < p_inf):
-
-                    pQueue.push((succesorState, totalDirection, totalCost), totalCost)
-
-    return []
-
+    util.raiseNotDefined()
 
 
 
@@ -285,111 +191,9 @@ def waStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has has the weighted (x 2) lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE FOR TASK 2 ***"
 
-    p_inf = float("inf")
 
-    pQueue = util.PriorityQueue();
-    closed = set()
+    util.raiseNotDefined()
 
-    bestG = {}
-
-    initState = problem.getStartState();
-    initDirections = []
-    initCost = 0
-
-    initNode = (initState, initDirections, initCost)
-
-    pQueue.push(initNode, 2*heuristic(initState, problem))
-
-    while (pQueue.isEmpty() != True ):
-
-        minNodePopped = pQueue.pop()
-        state = minNodePopped[0]
-        directions = minNodePopped[1]
-        cost = minNodePopped[2]
-
-
-        if (state not in closed or cost < bestG[state]):
-
-            closed.add(state)
-            bestG[state] = cost
-
-            if (problem.isGoalState(state)):
-                return directions
-
-
-            succesorNodes = problem.getSuccessors(state)
-
-            for successorNode in succesorNodes:
-
-                "Parse key data from succesorNodes"
-                succesorState = successorNode[0]
-                succesorDirection = successorNode[1]
-                succesorCost = successorNode[2]
-
-                cost = cost + succesorCost
-                totalCost = cost + 2*heuristic(succesorState, problem)
-
-                totalDirection = directions + [succesorDirection]
-
-                if (2*heuristic(succesorState, problem) < p_inf):
-
-                    pQueue.push((succesorState, totalDirection, totalCost), totalCost)
-
-    return []
-
-
-def foodHeuristic(state, problem):
-    """
-    Your heuristic for the FoodSearchProblem goes here.
-
-    This heuristic must be consistent to ensure correctness.  First, try to come
-    up with an admissible heuristic; almost all admissible heuristics will be
-    consistent as well.
-
-    If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
-    other hand, inadmissible or inconsistent heuristics may find optimal
-    solutions, so be careful.
-
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
-    (see game.py) of either True or False. You can call foodGrid.asList() to get
-    a list of food coordinates instead.
-
-    If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
-    are.
-
-    If you want to *store* information to be reused in other calls to the
-    heuristic, there is a dictionary called problem.heuristicInfo that you can
-    use. For example, if you only want to count the walls once and store that
-    value, try: problem.heuristicInfo['wallCount'] = problem.walls.count()
-    Subsequent calls to this heuristic can access
-    problem.heuristicInfo['wallCount']
-    """
-    position, foodGrid = state
-
-
-    "Useses the largest Manhtannan distance of the distances between Pacman's position"
-    "the food on the grid, using the max ensures ad admissable, and thus consistent heuristic"
-
-    foodList = foodGrid.asList()
-
-    maxDistance = 0
-
-    for food in foodList:
-
-        distance = manhattan_distance(position, food)
-
-        if (distance > maxDistance):
-            maxDistance = distance
-
-    return maxDistance
-
-def manhattan_distance(a,b):
-
-    xy1 = a
-    xy2 = b
-    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
 # Abbreviations
 bfs = breadthFirstSearch
