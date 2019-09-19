@@ -142,14 +142,39 @@ def DepthLimitingSearch(stack, depthLimit, problem):
 
 
 def iterativeDeepeningSearch(problem):
+    """This function is for the first of the grad students questions"""
+    "*** MY CODE HERE ***"
+    from game import Directions
 
-    """Search the deepest node in an iterative manner."""
+    #initialization
+    fringe = util.Stack()
+    limit = 1;
 
-    depthLimit = 1;
-    stack = util.Stack();
+    while True: # repeat search with the depth increases until we find the goal
+        visitedList = []
+        #push the starting point into stack
+        fringe.push((problem.getStartState(),[],0))
+        #pop out the point
+        (state,toDirection,toCost) = fringe.pop()
+        #add the point to visited list
+        visitedList.append(state)
+        while not problem.isGoalState(state): #while we do not find the goal point
+            successors = problem.getSuccessors(state) #get the point's succesors
+            for son in successors:
+                # add the points when it meets 1. not been visited 2. within the depth
+                if (not son[0] in visitedList) and (toCost + son[2] <= limit):
+                    fringe.push((son[0],toDirection + [son[1]],toCost + son[2]))
+                    visitedList.append(son[0]) # add this point to visited list
 
-    while (DepthLimitingSearch(stack, depthLimit, problem) == []):
-        depthLimit = depthLimit + 1
+            if fringe.isEmpty(): # if the no goal is found within the current depth, jump out and increase the depth
+                break
+
+            (state,toDirection,toCost) = fringe.pop()
+
+        if problem.isGoalState(state):
+            return toDirection
+
+        limit += 1 # increase the depth
 
     return DepthLimitingSearch(stack, depthLimit, problem)
 
